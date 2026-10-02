@@ -91,9 +91,9 @@ a.btn{text-decoration:none;display:inline-block}
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="eyebrow">Briefing de projeto · site / landing page</div>
+    <div class="eyebrow">Briefing de projeto · site institucional ou landing page</div>
     <h1>Conte o seu negócio, a gente <em>constrói o site</em> em cima disso.</h1>
-    <p class="lede">São 9 blocos curtos. Responda com as palavras que você usaria com um cliente. Tudo fica salvo neste navegador enquanto você preenche, então pode parar e voltar depois. No final é só revisar e enviar.</p>
+    <p class="lede">São blocos curtos, e as perguntas se ajustam ao tipo de site que você precisa. Responda com as palavras que você usaria com um cliente. Tudo fica salvo neste navegador enquanto você preenche, então pode parar e voltar depois. No final é só revisar e enviar.</p>
   </header>
 
   <div class="grid">
@@ -110,18 +110,40 @@ const ENDPOINT = "https://script.google.com/macros/s/AKfycbzhM2wIAebvtD1Rex7_r4H
 
 const STORE_KEY = "briefing-site-v1";
 
+// Condições: o tipo de site muda as perguntas mostradas
+const isLanding = () => (data.tipo || "").startsWith("Landing");
+const notLanding = () => !isLanding();
+
 const STEPS = [
- {id:"negocio", t:"O negócio", d:"Quem você é, o que faz e há quanto tempo. É a base de toda a página.", q:[
+ {id:"negocio", t:"O negócio", d:"Quem você é, o que faz e que tipo de site você precisa. É a base de todo o projeto.", q:[
+  {id:"tipo", l:"Que tipo de site você precisa?", type:"radio", req:1, why:"Isso muda a estrutura do site e as próximas perguntas. Se não tiver certeza, escolha “Ainda não sei” e a gente recomenda.", opts:["Site institucional (apresentar a empresa, várias páginas)","Landing page (uma página para vender ou captar contatos)","Portfólio (mostrar trabalhos e projetos)","Catálogo ou cardápio (muitos produtos ou itens)","Ainda não sei"]},
   {id:"nome", l:"Nome do negócio", type:"text", req:1, ph:"Ex.: Clínica Sorriso Leme"},
+  {id:"razao", l:"Razão social e CNPJ", type:"text", show:notLanding, why:"Aparecem no rodapé e na política de privacidade de sites institucionais."},
   {id:"segmento", l:"Segmento / área de atuação", type:"text", req:1, ph:"Ex.: odontologia estética"},
   {id:"local", l:"Onde atende?", type:"text", why:"Cidade, bairros, região, online para todo o Brasil… Isso muda o texto e o SEO local.", ph:"Ex.: Leme, Rio de Janeiro — presencial"},
   {id:"tempo", l:"Há quanto tempo existe?", type:"text", ph:"Ex.: desde 2014"},
   {id:"frase", l:"Explique o que você faz em uma frase, como diria para um desconhecido", type:"textarea", req:1, why:"Essa frase costuma virar o título principal do site."},
-  {id:"historia", l:"Como e por que o negócio começou?", type:"textarea", why:"Histórias reais geram confiança e alimentam a seção “Sobre”."},
+  {id:"historia", l:"Como e por que o negócio começou?", type:"textarea", why:"Histórias reais geram confiança e alimentam a página “Sobre”."},
   {id:"numeros", l:"Números que provam a sua experiência", type:"textarea", why:"Clientes atendidos, projetos entregues, nota no Google, anos de mercado, prêmios.", ph:"Ex.: +3.200 pacientes, nota 4,9 com 410 avaliações no Google"}
  ]},
+ {id:"institucional", t:"Identidade da empresa", show:notLanding, d:"Missão, visão, valores e a história da empresa. É o conteúdo que dá personalidade a um site institucional.", q:[
+  {id:"missao", l:"Qual é a missão da empresa?", type:"textarea", why:"Por que a empresa existe e o que ela faz pelas pessoas. Se ainda não tiver isso escrito, descreva com suas palavras.", ph:"Ex.: devolver a confiança no sorriso com tratamentos que respeitam a naturalidade do rosto"},
+  {id:"visao", l:"Qual é a visão da empresa?", type:"textarea", why:"Onde a empresa quer chegar nos próximos anos.", ph:"Ex.: ser referência em odontologia estética na Zona Sul do Rio até 2030"},
+  {id:"valores", l:"Quais são os valores da empresa?", type:"textarea", why:"Um por linha, com uma frase dizendo como esse valor aparece no dia a dia. Exemplos concretos valem mais que palavras soltas.", ph:"Transparência — o paciente sai da avaliação com o orçamento por escrito\n…"},
+  {id:"proposito", l:"Existe um propósito, manifesto ou frase que resume a empresa?", type:"textarea"},
+  {id:"marcos", l:"Marcos importantes da trajetória", type:"textarea", why:"Vira uma linha do tempo na página “Sobre”. Um marco por linha, com o ano.", ph:"2014 — abertura do primeiro consultório\n2019 — mudança para a sede atual\n…"},
+  {id:"lideranca", l:"Fundadores e liderança", type:"textarea", why:"Nome, cargo, formação e uma frase sobre cada pessoa. Sites institucionais ganham muita confiança mostrando quem está por trás da empresa."},
+  {id:"equipe_inst", l:"Equipe que deve aparecer no site", type:"textarea", why:"Nome, função e, se fizer sentido, registro profissional (CRO, CRM, CREA, OAB…).", ph:"Dra. Ana Lima — ortodontista, CRO-RJ 00000"},
+  {id:"estrutura", l:"Estrutura física", type:"textarea", why:"Sede, unidades, filiais, laboratório, fábrica, frota, equipamentos que são um diferencial.", ph:"Ex.: 2 unidades, 6 consultórios, tomógrafo próprio"},
+  {id:"mercados", l:"Setores ou tipos de cliente que a empresa atende", type:"textarea", why:"Comum em empresas B2B: indústria, varejo, condomínios, poder público…"},
+  {id:"clientes_parceiros", l:"Clientes, parceiros e fornecedores que podem aparecer no site", type:"textarea", why:"Só cite empresas que autorizam o uso do nome ou logo."},
+  {id:"certificacoes", l:"Certificações, associações e selos", type:"textarea", ph:"Ex.: ISO 9001, membro da ABO, selo Reclame Aqui RA1000"},
+  {id:"social", l:"Projetos sociais, ambientais ou de responsabilidade", type:"textarea"},
+  {id:"publicos", l:"Quem mais vai visitar o site, além dos clientes?", type:"checks", why:"Cada público pode pedir uma página própria.", opts:["Parceiros e fornecedores","Candidatos a vagas","Investidores","Imprensa","Poder público / licitações","Franqueados","Só clientes"]},
+  {id:"conteudo", l:"A empresa vai publicar notícias ou artigos?", type:"radio", opts:["Sim, com frequência","De vez em quando","Não"], why:"Um blog só vale a pena se alguém for alimentar."}
+ ]},
  {id:"oferta", t:"O que você vende", d:"Produtos e serviços, como cobra e o que te torna diferente.", q:[
-  {id:"servicos", l:"Liste seus produtos ou serviços principais", type:"textarea", req:1, why:"Um por linha, com uma frase curta sobre cada.", ph:"Lente de contato dental — …\nClareamento — …"},
+  {id:"servicos", l:"Liste seus produtos ou serviços principais", type:"textarea", req:1, why:"Um por linha, com uma frase curta sobre cada. Em sites institucionais, cada serviço importante pode ganhar uma página própria.", ph:"Lente de contato dental — …\nClareamento — …"},
   {id:"carro", l:"Qual é o carro-chefe, o que você mais quer vender?", type:"text", req:1},
   {id:"preco", l:"Faixa de preço e forma de cobrança", type:"textarea", why:"Não precisa aparecer no site. Ajuda a definir o tom (popular, premium) e o tipo de chamada.", ph:"Ex.: avaliação gratuita; tratamentos de R$ 800 a R$ 18.000, parcela em 12x"},
   {id:"processo", l:"Como funciona do primeiro contato até a entrega?", type:"textarea", why:"Vira a seção “Como funciona”, que tira a insegurança de quem nunca comprou de você.", ph:"1. Cliente chama no WhatsApp\n2. …"},
@@ -135,47 +157,52 @@ const STEPS = [
   {id:"desejo", l:"Qual resultado ele quer ter depois?", type:"textarea", req:1},
   {id:"objecoes", l:"O que faz ele hesitar antes de comprar?", type:"textarea", why:"Preço, medo, desconfiança, falta de tempo… O site precisa responder isso antes da pergunta aparecer."},
   {id:"faq", l:"Quais perguntas os clientes sempre fazem?", type:"textarea", why:"Pode colar direto do WhatsApp. Vira o FAQ do site.", ph:"Dói? Quanto tempo dura? Aceita convênio?"},
-  {id:"palavras", l:"Que palavras ou expressões seus clientes usam para falar do problema?", type:"textarea", why:"O site converte mais quando fala a língua do cliente, não a do mercado."},
-  {id:"origem", l:"Como os clientes chegam até você hoje?", type:"checks", opts:["Indicação","Instagram","Google","Anúncios pagos","WhatsApp","Marketplace","Eventos/feiras","Outros"]}
+  {id:"palavras", l:"Que palavras ou expressões seus clientes usam para falar do problema?", type:"textarea", why:"O site convence mais quando fala a língua do cliente, não a do mercado."},
+  {id:"origem", l:"Como os clientes chegam até você hoje?", type:"checks", opts:["Indicação","Instagram","Google","Anúncios pagos","WhatsApp","Marketplace","Eventos/feiras","Licitações","Outros"]}
  ]},
  {id:"mercado", t:"Concorrência", d:"Com quem você disputa atenção e o que eles fazem bem ou mal.", q:[
   {id:"concorrentes", l:"Principais concorrentes (nome ou site/Instagram)", type:"textarea"},
   {id:"conc_bom", l:"O que eles fazem bem?", type:"textarea"},
   {id:"conc_ruim", l:"Onde eles deixam a desejar?", type:"textarea", why:"Esse espaço vazio costuma ser o melhor argumento do seu site."}
  ]},
- {id:"objetivo", t:"Objetivo do site", d:"O que o site precisa fazer acontecer. Uma página com um objetivo claro vende mais.", q:[
-  {id:"obj", l:"Objetivo principal", type:"radio", req:1, opts:["Gerar contatos no WhatsApp","Captar leads em formulário","Agendar horários","Vender online","Apresentar a empresa / credibilidade","Mostrar portfólio","Lançamento de produto"]},
+ {id:"objetivo", t:"Objetivo do site", d:"O que o site precisa fazer acontecer para o seu negócio.", q:[
+  {id:"obj", l:"Objetivo principal", type:"radio", req:1, opts:["Fortalecer a imagem e a credibilidade da empresa","Gerar contatos no WhatsApp","Captar leads em formulário","Agendar horários","Vender online","Mostrar portfólio","Lançamento de produto","Atrair parceiros, franqueados ou talentos"]},
+  {id:"obj2", l:"Objetivos secundários", type:"checks", opts:["Ser encontrado no Google","Apoiar a equipe comercial","Receber currículos","Educar o mercado com conteúdo","Dar suporte a clientes atuais","Facilitar orçamentos"]},
   {id:"cta", l:"Qual ação o visitante deve fazer?", type:"text", req:1, ph:"Ex.: clicar em “Agendar avaliação” e falar no WhatsApp"},
-  {id:"oferta_entrada", l:"Existe uma oferta de entrada?", type:"text", why:"Avaliação grátis, cupom, diagnóstico, e-book, primeira aula… Dá um motivo para agir agora."},
-  {id:"trafego", l:"De onde virá o tráfego do site?", type:"checks", opts:["Anúncios Meta (Instagram/Facebook)","Google Ads","Busca orgânica (SEO)","Bio do Instagram","Link no WhatsApp","E-mail","Ainda não sei"]},
+  {id:"oferta_entrada", l:"Existe uma oferta de entrada?", type:"text", show:isLanding, why:"Avaliação grátis, cupom, diagnóstico, e-book, primeira aula… Dá um motivo para agir agora."},
+  {id:"trafego", l:"De onde virá o tráfego do site?", type:"checks", opts:["Anúncios Meta (Instagram/Facebook)","Google Ads","Busca orgânica (SEO)","Bio do Instagram","Link no WhatsApp","E-mail","Material impresso / cartão","Ainda não sei"]},
   {id:"sucesso", l:"Como vamos saber que o site deu certo?", type:"text", ph:"Ex.: 40 contatos por mês no WhatsApp"}
  ]},
  {id:"prova", t:"Provas e conteúdo", d:"O que já existe para mostrar e o que ainda precisa ser produzido.", q:[
   {id:"depoimentos", l:"Cole aqui depoimentos reais de clientes", type:"textarea", why:"Com nome e, se possível, cidade ou profissão. Prints de WhatsApp e avaliações do Google também servem (envie à parte)."},
-  {id:"autoridade", l:"Clientes conhecidos, certificações, prêmios, mídia", type:"textarea"},
-  {id:"materiais", l:"O que você já tem pronto para enviar?", type:"checks", opts:["Logo em boa qualidade","Fotos profissionais","Fotos do celular","Vídeos","Textos prontos","Antes e depois","Catálogo / tabela","Nada ainda"]},
+  {id:"cases", l:"Projetos ou cases que merecem destaque", type:"textarea", show:notLanding, why:"Cliente, desafio, o que foi feito e o resultado. Um por bloco."},
+  {id:"autoridade", l:"Clientes conhecidos, prêmios, aparições na mídia", type:"textarea"},
+  {id:"materiais", l:"O que você já tem pronto para enviar?", type:"checks", opts:["Logo em boa qualidade","Fotos profissionais","Fotos da equipe","Fotos da estrutura","Fotos do celular","Vídeo institucional","Textos prontos","Antes e depois","Catálogo / apresentação em PDF","Nada ainda"]},
   {id:"equipe", l:"Quem aparece no site? (você, equipe, só a marca)", type:"text"}
  ]},
  {id:"marca", t:"Marca e estilo", d:"Como o site deve parecer e soar.", q:[
   {id:"identidade", l:"Já tem identidade visual definida?", type:"radio", opts:["Sim, com manual de marca","Tenho logo e cores","Só o logo","Não tenho"]},
   {id:"cores", l:"Cores e fontes da marca (se souber)", type:"text", ph:"Ex.: azul-marinho #1B2A4A e dourado"},
-  {id:"adjetivos", l:"Escolha até 4 palavras que descrevem a sensação que o site deve passar", type:"checks", max:4, opts:["Confiável","Sofisticado","Acolhedor","Moderno","Divertido","Técnico","Minimalista","Ousado","Natural","Acessível","Exclusivo","Jovem"]},
+  {id:"adjetivos", l:"Escolha até 4 palavras que descrevem a sensação que o site deve passar", type:"checks", max:4, opts:["Confiável","Sofisticado","Acolhedor","Moderno","Tradicional","Divertido","Técnico","Minimalista","Ousado","Natural","Acessível","Exclusivo","Jovem","Sólido"]},
   {id:"tom", l:"Tom de voz", type:"radio", opts:["Formal","Profissional e próximo","Descontraído","Inspirador","Direto ao ponto"]},
   {id:"referencias", l:"2 ou 3 sites que você gosta (de qualquer área) e por quê", type:"textarea", why:"O “por quê” vale mais que o link."},
   {id:"evitar", l:"O que você não quer de jeito nenhum?", type:"textarea", ph:"Cores, palavras, estilos, fotos genéricas de banco de imagem…"}
  ]},
- {id:"tecnico", t:"Estrutura e contato", d:"Seções, recursos e os dados que vão aparecer na página.", q:[
+ {id:"tecnico", t:"Estrutura e contato", d:"Páginas, recursos e os dados que vão aparecer no site.", q:[
   {id:"site_atual", l:"Site atual (se tiver) e o que não funciona nele", type:"textarea"},
-  {id:"secoes", l:"Seções que você imagina na página", type:"checks", opts:["Topo com chamada","Serviços","Como funciona","Sobre / história","Equipe","Depoimentos","Antes e depois / portfólio","Preços / planos","FAQ","Blog","Mapa / localização","Contato"]},
-  {id:"recursos", l:"Recursos necessários", type:"checks", opts:["Botão de WhatsApp","Formulário","Agendamento online","Pagamento / loja","Pixel Meta / Google Analytics","Integração com CRM","Mais de um idioma","Área de membros"]},
+  {id:"paginas", l:"Páginas que o site deve ter", type:"checks", show:notLanding, opts:["Início","Sobre / Quem somos","Missão, visão e valores","Nossa história","Equipe","Serviços (uma página para cada)","Áreas de atuação / Segmentos","Clientes e cases","Portfólio / Projetos","Estrutura / Unidades","Certificações","Responsabilidade social","Blog / Notícias","Trabalhe conosco","FAQ","Contato","Política de privacidade"]},
+  {id:"secoes", l:"Seções que você imagina na página", type:"checks", show:isLanding, opts:["Topo com chamada","Serviços","Como funciona","Sobre / história","Equipe","Depoimentos","Antes e depois / portfólio","Preços / planos","FAQ","Mapa / localização","Contato"]},
+  {id:"recursos", l:"Recursos necessários", type:"checks", opts:["Botão de WhatsApp","Formulário de contato","Agendamento online","Pedido de orçamento","Envio de currículo","Área de downloads (PDFs, catálogos)","Mapa das unidades","Pagamento / loja","Pixel Meta / Google Analytics","Integração com CRM","Mais de um idioma","Área de clientes"]},
+  {id:"idiomas", l:"Em quais idiomas?", type:"text", show:()=>((data.recursos||[]).includes("Mais de um idioma")), ph:"Ex.: português e inglês"},
   {id:"dominio", l:"Domínio", type:"text", ph:"Ex.: já tenho clinicasorriso.com.br / preciso comprar"},
-  {id:"contatos", l:"Contatos que aparecem no site", type:"textarea", req:1, why:"WhatsApp, telefone, e-mail, endereço, horário de atendimento.", ph:"WhatsApp: (21) …\nEndereço: …\nHorário: seg a sex, 9h às 19h"},
+  {id:"contatos", l:"Contatos que aparecem no site", type:"textarea", req:1, why:"WhatsApp, telefone, e-mail, endereço de cada unidade, horário de atendimento.", ph:"WhatsApp: (21) …\nEndereço: …\nHorário: seg a sex, 9h às 19h"},
   {id:"redes", l:"Redes sociais", type:"textarea", ph:"@instagram, LinkedIn, YouTube…"}
  ]},
  {id:"projeto", t:"Prazo e aprovação", d:"Últimos detalhes para a proposta.", q:[
   {id:"prazo", l:"Para quando você precisa do site?", type:"text", ph:"Ex.: antes da campanha de novembro"},
   {id:"aprovador", l:"Quem aprova o projeto?", type:"text"},
-  {id:"investimento", l:"Faixa de investimento prevista", type:"radio", opts:["Até R$ 1.500","R$ 1.500 a R$ 3.000","R$ 3.000 a R$ 6.000","Acima de R$ 6.000","Prefiro ver a proposta"]},
+  {id:"manutencao", l:"Depois de pronto, quem vai atualizar o site?", type:"radio", opts:["Eu ou minha equipe","Quero contratar manutenção","Só atualizações raras"]},
+  {id:"investimento", l:"Faixa de investimento prevista", type:"radio", opts:["Até R$ 1.500","R$ 1.500 a R$ 3.000","R$ 3.000 a R$ 6.000","R$ 6.000 a R$ 12.000","Acima de R$ 12.000","Prefiro ver a proposta"]},
   {id:"obs", l:"Algo mais que devemos saber?", type:"textarea"},
   {id:"resp_nome", l:"Seu nome e WhatsApp", type:"text", req:1}
  ]}
@@ -184,7 +211,12 @@ const STEPS = [
 let data = {};
 try { data = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch(e) { data = {}; }
 let cur = 0;
-const ALL = STEPS.flatMap(s => s.q.map(q => ({...q, step:s})));
+
+const vis = x => !x.show || x.show();
+const ALL = STEPS.flatMap(s => s.q.map(q => ({...q, step:s})));           // todas as perguntas (colunas da planilha)
+const VSTEPS = () => STEPS.filter(vis);                                     // etapas visíveis para este tipo de site
+const VQ = s => s.q.filter(vis);
+const VALL = () => VSTEPS().flatMap(s => VQ(s).map(q => ({...q, step:s}))); // perguntas visíveis
 
 function save(){
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
@@ -193,24 +225,27 @@ function save(){
   if (s) s.textContent = "Rascunho salvo neste navegador";
 }
 const filled = q => { const v = data[q.id]; return Array.isArray(v) ? v.length>0 : !!(v && String(v).trim()); };
-const stepDone = s => s.q.filter(q=>q.req).every(filled) && s.q.some(filled);
+const stepDone = s => VQ(s).filter(q=>q.req).every(filled) && VQ(s).some(filled);
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 function renderRail(){
+  const steps = VSTEPS();
+  if (cur > steps.length) cur = steps.length;
   const rail = document.getElementById("rail");
-  rail.innerHTML = [...STEPS.map((s,i)=>`<button class="step-btn ${stepDone(s)?"done":""}" data-i="${i}" ${i===cur?'aria-current="step"':""}><span class="n">${stepDone(s)?"✓":i+1}</span><span>${s.t}</span></button>`),
-    `<button class="step-btn" data-i="${STEPS.length}" ${cur===STEPS.length?'aria-current="step"':""}><span class="n">→</span><span>Revisar e enviar</span></button>`,
+  rail.innerHTML = [...steps.map((s,i)=>`<button class="step-btn ${stepDone(s)?"done":""}" data-i="${i}" ${i===cur?'aria-current="step"':""}><span class="n">${stepDone(s)?"✓":i+1}</span><span>${s.t}</span></button>`),
+    `<button class="step-btn" data-i="${steps.length}" ${cur===steps.length?'aria-current="step"':""}><span class="n">→</span><span>Revisar e enviar</span></button>`,
     `<div class="meter"><span id="meterTxt"></span><div class="bar"><i id="meterBar"></i></div></div>`].join("");
   rail.querySelectorAll(".step-btn").forEach(b=>b.onclick=()=>go(+b.dataset.i));
   updateMeta();
 }
 function updateMeta(){
-  const n = ALL.filter(filled).length, pct = Math.round(n/ALL.length*100);
+  const all = VALL(), n = all.filter(filled).length, pct = Math.round(n/all.length*100);
   const t = document.getElementById("meterTxt"), b = document.getElementById("meterBar");
-  if (t) t.textContent = `${n} de ${ALL.length} respostas · ${pct}%`;
+  if (t) t.textContent = `${n} de ${all.length} respostas · ${pct}%`;
   if (b) b.style.width = pct + "%";
-  document.querySelectorAll(".step-btn").forEach((el,i)=>{ if(i<STEPS.length){ const d=stepDone(STEPS[i]); el.classList.toggle("done",d); el.querySelector(".n").textContent = d?"✓":i+1; }});
+  const steps = VSTEPS();
+  document.querySelectorAll(".step-btn").forEach((el,i)=>{ if(i<steps.length){ const d=stepDone(steps[i]); el.classList.toggle("done",d); el.querySelector(".n").textContent = d?"✓":i+1; }});
 }
 
 function field(q){
@@ -227,18 +262,23 @@ function go(i){ cur=i; renderRail(); render(); window.scrollTo({top:0,behavior:"
 
 function render(){
   const sheet = document.getElementById("sheet");
-  if (cur===STEPS.length) return renderReview(sheet);
-  const s = STEPS[cur];
-  sheet.innerHTML = `<div class="sheet-head"><span class="eyebrow">Etapa ${cur+1} de ${STEPS.length}</span><h2>${s.t}</h2><p>${s.d}</p></div>
-    ${s.q.map(field).join("")}
-    <div class="foot"><button class="btn" id="prev" ${cur===0?"disabled":""}>Voltar</button><span class="saved" id="saved"></span><button class="btn primary" id="next">${cur===STEPS.length-1?"Revisar briefing":"Próxima etapa"}</button></div>`;
+  const steps = VSTEPS();
+  if (cur>=steps.length) return renderReview(sheet);
+  const s = steps[cur];
+  sheet.innerHTML = `<div class="sheet-head"><span class="eyebrow">Etapa ${cur+1} de ${steps.length}</span><h2>${s.t}</h2><p>${s.d}</p></div>
+    ${VQ(s).map(field).join("")}
+    <div class="foot"><button class="btn" id="prev" ${cur===0?"disabled":""}>Voltar</button><span class="saved" id="saved"></span><button class="btn primary" id="next">${cur===steps.length-1?"Revisar briefing":"Próxima etapa"}</button></div>`;
   sheet.querySelectorAll("input[type=text],textarea").forEach(el=>el.addEventListener("input",()=>{data[el.dataset.id]=el.value;save();}));
-  sheet.querySelectorAll("input[type=radio]").forEach(el=>el.addEventListener("change",()=>{data[el.dataset.id]=el.value;save();}));
+  sheet.querySelectorAll("input[type=radio]").forEach(el=>el.addEventListener("change",()=>{
+    data[el.dataset.id]=el.value; save();
+    if (el.dataset.id==="tipo") renderRail(); // o tipo de site mostra ou esconde etapas
+  }));
   sheet.querySelectorAll("input[type=checkbox]").forEach(el=>el.addEventListener("change",()=>{
     const q = ALL.find(x=>x.id===el.dataset.id);
     let arr = Array.from(sheet.querySelectorAll(`input[name="f_${q.id}"]:checked`)).map(x=>x.value);
     if (q.max && arr.length>q.max){ el.checked=false; arr = arr.filter(x=>x!==el.value); }
     data[q.id]=arr; save();
+    if (q.id==="recursos"){ const y=scrollY; render(); scrollTo(0,y); const f=document.getElementById(el.id); if(f) f.focus(); }
   }));
   document.getElementById("prev").onclick=()=>go(cur-1);
   document.getElementById("next").onclick=()=>go(cur+1);
@@ -247,19 +287,22 @@ function render(){
 function val(q){ const v=data[q.id]; return Array.isArray(v)? v.join(", ") : (v||"").trim(); }
 
 function buildBriefing(){
+  const all = VALL();
   const nome = val(ALL.find(q=>q.id==="nome")) || "o cliente";
-  const missing = ALL.filter(q=>!filled(q));
+  const tipo = data.tipo || "Não informado";
+  const missing = all.filter(q=>!filled(q));
   let out = `# BRIEFING DE SITE — ${nome.toUpperCase()}\n\n`;
+  out += `**Tipo de site pedido pelo cliente:** ${tipo}\n\n`;
   out += `## Instruções para o agente\n`;
-  out += `Você vai criar uma landing page para o negócio descrito abaixo. Regras:\n`;
-  out += `- Use somente os fatos deste briefing. Não invente números, depoimentos, prêmios, preços ou garantias.\n`;
+  out += `Você vai criar um site para o negócio descrito abaixo. Regras:\n`;
+  out += `- Respeite o tipo de site informado. Um site institucional não deve ter cara de landing page.\n`;
+  out += `- Use somente os fatos deste briefing. Não invente números, depoimentos, prêmios, preços, garantias, missão, visão ou valores.\n`;
   out += `- Onde faltar informação, deixe um marcador visível [PENDENTE: o que falta] em vez de preencher.\n`;
-  out += `- Escreva com as palavras que o cliente final usa (seção "Linguagem do cliente").\n`;
-  out += `- Toda a página serve ao objetivo principal e à ação principal (CTA) definidos abaixo.\n`;
-  out += `- Responda às objeções e perguntas frequentes ao longo da página, não só no FAQ.\n`;
-  out += `- Siga o tom de voz, a personalidade e as restrições visuais ("Evitar").\n\n`;
-  for (const s of STEPS){
-    const lines = s.q.filter(filled).map(q=>{
+  out += `- Escreva com as palavras que o cliente final usa (respostas sobre a linguagem do cliente).\n`;
+  out += `- Todo o site serve ao objetivo principal e à ação principal (CTA) definidos abaixo.\n`;
+  out += `- Siga o tom de voz, a personalidade e as restrições visuais ("O que você não quer").\n\n`;
+  for (const s of VSTEPS()){
+    const lines = VQ(s).filter(filled).map(q=>{
       const v = val(q);
       return v.includes("\n") ? `**${q.l}**\n${v}\n` : `**${q.l}:** ${v}`;
     });
@@ -275,12 +318,12 @@ function buildBriefing(){
 function sendState(){ try { return localStorage.getItem(STORE_KEY+"-sent"); } catch(e){ return null; } }
 
 async function submitBriefing(txt){
-  const ids = Object.fromEntries(ALL.map(q=>[q.id, val(q)]));
-  const n = ALL.filter(filled).length;
+  const ids = Object.fromEntries(ALL.map(q=>[q.id, (vis(q)&&vis(q.step)) ? val(q) : ""]));
+  const n = VALL().filter(filled).length;
   const payload = {
     hp: (document.getElementById("hp_site")||{}).value || "",
     enviadoEm: new Date().toISOString(),
-    completude: Math.round(n/ALL.length*100),
+    completude: Math.round(n/VALL().length*100),
     briefing: txt,
     campos: ids,
     rotulos: Object.fromEntries(ALL.map(q=>[q.id, q.l]))
@@ -300,14 +343,15 @@ async function submitBriefing(txt){
 }
 
 function renderReview(sheet){
-  const reqMissing = ALL.filter(q=>q.req && !filled(q));
-  const n = ALL.filter(filled).length, pct = Math.round(n/ALL.length*100);
+  const all = VALL(), steps = VSTEPS();
+  const reqMissing = all.filter(q=>q.req && !filled(q));
+  const n = all.filter(filled).length, pct = Math.round(n/all.length*100);
   const txt = buildBriefing();
   const configured = ENDPOINT && !ENDPOINT.startsWith("COLE_AQUI");
   const sentAt = sendState();
   sheet.innerHTML = `<div class="sheet-head"><span class="eyebrow">Última etapa</span><h2>Revisar e enviar</h2><p>Confira o resumo das suas respostas. Quando estiver tudo certo, toque em “Enviar briefing”.</p></div>
-    <div class="score"><span class="big">${pct}%</span><span class="why">${n} de ${ALL.length} perguntas respondidas</span></div>
-    ${reqMissing.length?`<div class="gaps"><b>Ainda faltam ${reqMissing.length} respostas essenciais</b><ul>${reqMissing.map(q=>`<li><a href="#" data-step="${STEPS.indexOf(q.step)}" style="color:var(--accent)">${esc(q.l)}</a></li>`).join("")}</ul></div>`:`<div class="gaps"><b style="color:var(--ok)">Todas as respostas essenciais estão preenchidas.</b><span class="why">Quanto mais detalhes nos campos opcionais, mais o site vai soar como você.</span></div>`}
+    <div class="score"><span class="big">${pct}%</span><span class="why">${n} de ${all.length} perguntas respondidas</span></div>
+    ${reqMissing.length?`<div class="gaps"><b>Ainda faltam ${reqMissing.length} respostas essenciais</b><ul>${reqMissing.map(q=>`<li><a href="#" data-step="${steps.indexOf(q.step)}" style="color:var(--accent)">${esc(q.l)}</a></li>`).join("")}</ul></div>`:`<div class="gaps"><b style="color:var(--ok)">Todas as respostas essenciais estão preenchidas.</b><span class="why">Quanto mais detalhes nos campos opcionais, mais o site vai soar como você.</span></div>`}
     <div id="sentBox" class="sent" ${sentAt?"":"hidden"}><b>Briefing enviado.</b><span>Recebemos suas respostas${sentAt?` em ${new Date(sentAt).toLocaleString("pt-BR")}`:""}. Se mudar alguma coisa, pode editar e enviar de novo.</span></div>
     <pre class="out" id="out" tabindex="0">${esc(txt)}</pre>
     <label class="hp" aria-hidden="true">Não preencha <input type="text" id="hp_site" tabindex="-1" autocomplete="off"></label>
